@@ -24,6 +24,7 @@ public class AuthController {
         this.authenticationManager=authenticationManager;
         this.jwtUtils=jwtUtils;
     }
+    
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(

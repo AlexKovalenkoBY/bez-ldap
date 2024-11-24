@@ -1,0 +1,160 @@
+# Корневая запись домена test.bpab.internal
+dn: dc=test,dc=bpab,dc=internal
+objectClass: top
+objectClass: domain
+dc: test
+
+# Организационная единица 'groups'
+dn: ou=groups,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: organizationalUnit
+ou: groups
+
+# Организационная единица 'people'
+dn: ou=people,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: organizationalUnit
+ou: people
+
+# Пользователь 'admin'
+dn: uid=admin,ou=people,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Rod Johnson
+sn: Johnson
+uid: admin
+userPassword: password
+mail: rod.johnson@test.bpab.internal
+title: Administrator
+givenName: Rod
+displayName: Rod Johnson
+departmentNumber: 101
+
+# Пользователь 'user'
+dn: uid=user,ou=people,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: Dianne Emu
+sn: Emu
+uid: user
+userPassword: password
+givenName: Dianne
+mail: dianne.emu@test.bpab.internal
+title: User
+displayName: Dianne Emu
+departmentNumber: 201
+
+# Группа 'user'
+dn: cn=user,ou=groups,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: groupOfNames
+cn: user
+member: uid=admin,ou=people,dc=test,dc=bpab,dc=internal
+member: uid=user,ou=people,dc=test,dc=bpab,dc=internal
+member: uid=dkuser,ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal
+member: uid=ppouser,ou=PPO-U,ou=8,dc=test,dc=bpab,dc=internal
+member: uid=uvauser,ou=UVA-U,ou=8,dc=test,dc=bpab,dc=internal
+
+# Группа 'admin'
+dn: cn=admin,ou=groups,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: groupOfNames
+cn: admin
+member: uid=admin,ou=people,dc=test,dc=bpab,dc=internal
+
+# Организационная единица '8'
+dn: ou=8,dc=test,dc=bpab,dc=internal
+objectClass: top
+objectClass: organizationalUnit
+ou: 8
+
+# Группа 'PPO-U'member
+dn: ou=PPO-U,ou=8,dc=test,dc=bpab,dc=internal
+objectClass: top
+objectClass: organizationalUnit
+ou: PPO-U
+
+# Пользователь 'ppouser'
+dn: uid=ppouser,ou=PPO-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: PPO User
+sn: User
+uid: ppouser
+userPassword: password
+mail: ppo.user@test.bpab.internal
+title: PPO Specialist
+givenName: PPO
+displayName: PPO User
+departmentNumber: 301
+
+# Группа 'UVA-U'
+dn: ou=UVA-U,ou=8,dc=test,dc=bpab,dc=internal
+objectClass: top
+objectClass: organizationalUnit
+ou: UVA-U
+
+# Пользователь 'uvauser'
+dn: uid=uvauser,ou=UVA-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: UVA User
+sn: User
+uid: uvauser
+userPassword: password
+mail: uva.user@test.bpab.internal
+title: UVA Specialist
+givenName: UVA
+displayName: UVA User
+departmentNumber: 401
+
+# Группа 'DK-U'
+dn: ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal
+objectClass: top
+objectClass: organizationalUnit
+ou: DK-U
+
+# Пользователь 'dkuser'
+dn: uid=dkuser,ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: DK User
+sn: User
+uid: dkuser
+userPassword: password
+mail: dk.user@test.bpab.internal
+title: DK Specialist
+givenName: DK
+displayName: DK User
+departmentNumber: 501
+
+# Группа 'PPO-U'
+dn: cn=PPO-U,ou=PPO-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: groupOfNames
+cn: PPO-U
+member: uid=ppouser,ou=PPO-U,ou=8,dc=test,dc=bpab,dc=internal
+
+# Группа 'UVA-U'
+dn: cn=UVA-U,ou=UVA-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: groupOfNames
+cn: UVA-U
+member: uid=uvauser,ou=UVA-U,ou=8,dc=test,dc=bpab,dc=internal
+
+# Группа 'DK-U'
+dn: cn=DK-U,ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal
+objectclass: top
+objectclass: groupOfNames
+cn: DK-U
+member: uid=dkuser,ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal

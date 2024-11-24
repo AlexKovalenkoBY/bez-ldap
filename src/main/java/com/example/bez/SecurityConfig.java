@@ -4,6 +4,7 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -23,6 +24,11 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +45,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/welcome").permitAll() // вход без авторизации
                 .requestMatchers("/admin/**").hasRole("ADMIN") // доступ только для роли admin
+                .requestMatchers("/api/auth/user/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
                 .requestMatchers("/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешить OPTIONS для всех запросов
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -58,7 +66,8 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(new Http403ForbiddenEntryPoint()) // Настройка обработки ошибок аутентификации
             )
-            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Добавляем CORS конфигурацию
         return http.build();
     }
 
@@ -104,5 +113,21 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public LdapTemplate ldapTemplate(LdapContextSource contextSource) {
+        return new LdapTemplate(contextSource);
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*"); // Разрешить все источники
+        configuration.addAllowedMethod("*"); // Разрешить все методы
+        configuration.addAllowedHeader("*"); // Разрешить все заголовки
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

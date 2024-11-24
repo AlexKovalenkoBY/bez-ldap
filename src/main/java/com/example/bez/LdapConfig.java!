@@ -2,11 +2,8 @@ package com.example.bez;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.core.support.BaseLdapPathContextSource;
+import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 
 @Configuration
 public class LdapConfig {
@@ -14,22 +11,15 @@ public class LdapConfig {
     @Bean
     public LdapContextSource contextSource() {
         LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl("ldap://localhost:389");
-        contextSource.setBase("dc=ds,dc=bapb,dc=internal");
-        contextSource.setUserDn("cn=Manager,dc=ds,dc=bapb,dc=internal");
+        contextSource.setUrl("ldap://127.0.0.1:8389");
+        contextSource.setBase("dc=test,dc=bpab,dc=internal");
+        contextSource.setUserDn("uid=dkuser,ou=DK-U,ou=8,dc=test,dc=bpab,dc=internal");
         contextSource.setPassword("password");
         return contextSource;
     }
 
     @Bean
-    public BindAuthenticator authenticator(BaseLdapPathContextSource contextSource) {
-        BindAuthenticator authenticator = new BindAuthenticator(contextSource);
-        authenticator.setUserDnPatterns(new String[]{"cn={0},ou=UVA-U,ou=8"});
-        return authenticator;
+    public LdapTemplate ldapTemplate(LdapContextSource contextSource) {
+        return new LdapTemplate(contextSource);
     }
-
-    // @Bean
-    // public LdapAuthenticationProvider ldapAuthenticationProvider(BindAuthenticator authenticator) {
-    //     return new LdapAuthenticationProvider(authenticator);
-    // }
 }

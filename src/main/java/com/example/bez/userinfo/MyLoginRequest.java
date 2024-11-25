@@ -1,8 +1,8 @@
-package com.example.bez.user;
+package com.example.bez.userinfo;
 import lombok.*;
 @Getter
 @Setter
-public class LoginRequest {
+public class MyLoginRequest {
     private String username;
     private String password;
 

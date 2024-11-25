@@ -43,11 +43,9 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/login").permitAll()
-               // .requestMatchers("/welcome").permitAll() // вход без авторизации
-               // .requestMatchers("/admin/**").hasRole("ADMIN") // доступ только для роли admin
-                .requestMatchers("/api/auth/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
-               // .requestMatchers("/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
+                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/user").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
+                .requestMatchers("/api/auth/user/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешить OPTIONS для всех запросов
                 .anyRequest().authenticated()
             )

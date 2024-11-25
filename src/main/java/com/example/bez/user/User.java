@@ -1,8 +1,7 @@
-package com.example.bez;
+package com.example.bez.user;
 
 import javax.naming.Name;
 import org.springframework.ldap.odm.annotations.Attribute;
-import org.springframework.ldap.odm.annotations.DnAttribute;
 import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 

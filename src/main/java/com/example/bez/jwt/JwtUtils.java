@@ -1,4 +1,4 @@
-package com.example.bez;
+package com.example.bez.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

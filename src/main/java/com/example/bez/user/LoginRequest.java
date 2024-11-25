@@ -1,4 +1,4 @@
-package com.example.bez;
+package com.example.bez.user;
 import lombok.*;
 @Getter
 @Setter

@@ -28,7 +28,7 @@
     methods: {
       async handleLogin() {
         try {
-          const response = await axios.post('http://localhost:8080/api/auth/login', {
+          const response = await axios.post('http://localhost:8080/login', {
             username: this.username,
             password: this.password,
           });

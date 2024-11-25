@@ -1,4 +1,4 @@
-package com.example.bez;
+package com.example.bez.jwt;
 
 public class JwtResponse {
     private String token;

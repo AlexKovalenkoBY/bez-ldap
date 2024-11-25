@@ -1,4 +1,4 @@
-package com.example.bez;
+package com.example.bez.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;

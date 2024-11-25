@@ -1,4 +1,4 @@
-package com.example.bez;
+package com.example.bez.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.bez.UserDetailsResponse;
+import com.example.bez.jwt.JwtResponse;
+import com.example.bez.jwt.JwtUtils;
+import com.example.bez.user.LoginRequest;
+import com.example.bez.user.User;
+import com.example.bez.user.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -47,8 +53,7 @@ public class AuthController {
     }
 
     @GetMapping("/user/{username}")
-    
-    public ResponseEntity<?> getUserDetails(@PathVariable String username) {
+        public ResponseEntity<?> getUserDetails(@PathVariable String username) {
         User user = userService.findUserByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();

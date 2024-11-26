@@ -45,7 +45,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication.getName());
+        String jwt = jwtUtils.generateToken(authentication.getName());
 
         // Find user and determine role
         MyUser user = userService.findUserByUsername(loginRequest.getUsername());

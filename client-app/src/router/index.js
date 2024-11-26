@@ -14,12 +14,15 @@ const routes = [
     name: 'Login',
     component: LoginForm,
   },
+  
   {
-    path: '/dashboard',
+    path: '/dashboard/:username',
     name: 'Dashboard',
     component: DashboardComponent,
     meta: { requiresAuth: true },
+    props: true, // Это позволяет передавать параметры в качестве свойств
   },
+
 ];
 
 const router = createRouter({

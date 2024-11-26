@@ -18,6 +18,13 @@
 import axios from 'axios';
 
 export default {
+  name: DashboardComponent,
+  props: {
+    username: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       userDetails: null,
@@ -31,8 +38,8 @@ export default {
     async fetchUserDetails() {
       try {
         const token = localStorage.getItem('accessToken');
-        console.log('found token - ',token);
-        const response = await axios.get('http://localhost:8080/api/auth/user', {
+        console.log('found token - ', token);
+        const response = await axios.get(`http://localhost:8080/api/auth/user/${this.username}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

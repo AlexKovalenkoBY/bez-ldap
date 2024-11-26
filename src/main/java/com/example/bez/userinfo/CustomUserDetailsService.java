@@ -1,6 +1,5 @@
 package com.example.bez.userinfo;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;

@@ -20,6 +20,7 @@
 import axios from 'axios';
 
 export default {
+  name: LoginForm,
   data() {
     return {
       username: '',
@@ -37,7 +38,7 @@ export default {
         const refreshToken = response.data.refreshToken;
         localStorage.setItem('accessToken', accessToken); // Сохранение accessToken в localStorage
         localStorage.setItem('refreshToken', refreshToken); // Сохранение refreshToken в localStorage
-        this.$router.push('/dashboard');
+        this.$router.push({ name: 'Dashboard', params: { username: this.username } });
       } catch (error) {
         console.error('Login failed', error);
       }
@@ -45,7 +46,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .login-form {
   max-width: 300px;

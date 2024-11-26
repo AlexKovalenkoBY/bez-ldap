@@ -19,6 +19,7 @@ import com.example.bez.jwt.JwtUtils;
 import com.example.bez.userinfo.MyLoginRequest;
 import com.example.bez.userinfo.MyUser;
 import com.example.bez.userinfo.UserService;
+import lombok.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -43,15 +44,16 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication.getName());
 
         // Find user and determine role
         MyUser user = userService.findUserByUsername(loginRequest.getUsername());
         String role = userService.determineRole(user.getDn().toString());
-        SecurityContext context =  SecurityContextHolder.createEmptyContext();
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
+
         return ResponseEntity.ok(new JwtResponse(jwt, role));
     }
 

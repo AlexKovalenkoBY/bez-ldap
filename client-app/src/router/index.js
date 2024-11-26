@@ -1,5 +1,7 @@
+// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '../components/LoginForm.vue';
+import DashboardComponent from '../components/DashboardComponent.vue';
 
 const routes = [
   {
@@ -8,9 +10,14 @@ const routes = [
     component: LoginForm,
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: LoginForm,
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
-    component: () => import('../components/DashboardComponent.vue'),
+    component: DashboardComponent,
     meta: { requiresAuth: true },
   },
 ];
@@ -21,9 +28,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token');
-  if (to.matched.some(record => record.meta.requiresAuth) && !token) {
-    next('/');
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!accessToken) {
+      next({ name: 'Login' });
+    } else {
+      next();
+    }
   } else {
     next();
   }

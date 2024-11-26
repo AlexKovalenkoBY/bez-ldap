@@ -43,9 +43,9 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/login").permitAll() // Разрешить доступ без проверки токена
                 .requestMatchers("/api/auth/user").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
-                .requestMatchers("/api/auth/user/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
+                .requestMatchers("/api/auth/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешить OPTIONS для всех запросов
                 .anyRequest().authenticated()
             )

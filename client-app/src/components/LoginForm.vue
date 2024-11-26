@@ -1,3 +1,4 @@
+<!-- src/components/LoginForm.vue -->
 <template>
   <div class="login-form">
     <h2>Login</h2>
@@ -32,8 +33,10 @@ export default {
           username: this.username,
           password: this.password,
         });
-        const token = response.data.token;
-        localStorage.setItem('token', token); // Сохранение токена в localStorage
+        const accessToken = response.data.token;
+        const refreshToken = response.data.refreshToken;
+        localStorage.setItem('accessToken', accessToken); // Сохранение accessToken в localStorage
+        localStorage.setItem('refreshToken', refreshToken); // Сохранение refreshToken в localStorage
         this.$router.push('/dashboard');
       } catch (error) {
         console.error('Login failed', error);

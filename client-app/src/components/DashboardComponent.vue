@@ -30,7 +30,8 @@ export default {
     },
     async fetchUserDetails() {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
+        console.log('found token - ',token);
         const response = await axios.get('http://localhost:8080/api/auth/user', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -40,7 +41,7 @@ export default {
       } catch (error) {
         console.error('Failed to fetch user details', error);
         if (error.response && error.response.status === 403) {
-          localStorage.removeItem('token'); // Удаление недействительного токена
+          localStorage.removeItem('accessToken'); // Удаление недействительного токена
           this.$router.push('/login'); // Перенаправление на страницу входа
         }
       }

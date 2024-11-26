@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -16,16 +18,18 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.bez.UserDetailsResponse;
 import com.example.bez.jwt.JwtResponse;
 import com.example.bez.jwt.JwtUtils;
 import com.example.bez.storage.StorageFileNotFoundException;
-import com.example.bez.storage.StorageService;
+import com.example.bez.storage.StorageServiceInterface;
 import com.example.bez.userinfo.MyLoginRequest;
 import com.example.bez.userinfo.MyUser;
 import com.example.bez.userinfo.UserService;
 import io.jsonwebtoken.io.IOException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +48,10 @@ public class AuthController {
     @Autowired
     UserService userService;
 
-    private final StorageService storageService;
+    private final StorageServiceInterface storageService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils, StorageService storageService) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
+    StorageServiceInterface storageService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.storageService = storageService;
@@ -93,38 +98,23 @@ public class AuthController {
                 user.getSurname(),
                 user.getGivenName(),
                 user.getDisplayName(),
-                role
-        );
+                role);
 
         return ResponseEntity.ok(userDetails);
     }
 
-    @GetMapping("/current-user")
+    @GetMapping("/getFilesList")
     public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
         // Извлекаем имя пользователя из токена
         String username = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+
         if (username == null) {
             return ResponseEntity.badRequest().body("Invalid token");
         }
-
-        // Находим пользователя по имени
-        MyUser user = userService.findUserByUsername(username);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        // Определяем роль пользователя
-        String role = userService.determineRole(user.getDn().toString());
-        UserDetailsResponse userDetails = new UserDetailsResponse(
-                user.getUsername(),
-                user.getCommonName(),
-                user.getSurname(),
-                user.getGivenName(),
-                user.getDisplayName(),
-                role
-        );
-
-        return ResponseEntity.ok(userDetails);
+        return ResponseEntity.ok(storageService.loadAll().map(
+                path -> MvcUriComponentsBuilder.fromMethodName(AuthController.class,
+                        "serveFile", path.getFileName().toString()).build().toUri().toString())
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/upload-dir/{filename:.+}")
@@ -148,7 +138,8 @@ public class AuthController {
         try {
             if (!file.isEmpty()) {
                 storageService.store(file);
-                redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + file.getOriginalFilename() + "!");
+                redirectAttributes.addFlashAttribute("message",
+                        "You successfully uploaded " + file.getOriginalFilename() + "!");
             }
         } catch (Exception e) {
             log.error("Error uploading file", e);
@@ -162,4 +153,5 @@ public class AuthController {
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
     }
+
 }

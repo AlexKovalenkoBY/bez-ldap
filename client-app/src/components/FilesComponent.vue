@@ -47,6 +47,8 @@ export default {
         return {
             folderList: [], // Здесь будет список файлов
             fileToDelete: '', // Имя файла, который нужно удалить
+            getFilesList,
+            fileList,
         };
     },
     methods: {
@@ -61,6 +63,29 @@ export default {
             this.folderList = this.folderList.filter(file => file.name !== this.fileToDelete);
             $('#confirmModal').modal('hide');
         },
+        async getFilesList() {
+            try {
+
+
+                const token = localStorage.getItem('accessToken');
+                if (token) {
+                    const response = await axios.post('http://localhost:8080/api/auth/getFilesList', {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                    this.fileList = response.data;
+                } else {
+                    this.$router.push({ name: 'Login' });
+                }
+            } catch (error) {
+                console.error('Failed to fetch user files list ', error);
+                if (error.response && error.response.status === 403) {
+                    localStorage.removeItem('accessToken'); // Удаление недействительного токена
+                    this.$router.push('/login'); // Перенаправление на страницу входа
+                }
+            }
+        }
     },
     mounted() {
         // Пример заполнения списка файлов

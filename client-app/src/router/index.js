@@ -2,27 +2,26 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginForm from '../components/LoginForm.vue';
 import DashboardComponent from '../components/DashboardComponent.vue';
+import FilesComponent from '../components/FilesComponent.vue';
 
 const routes = [
   {
     path: '/',
-    name: 'Login',
-    component: LoginForm,
+    name: 'Files',
+    component: FilesComponent,
+    meta: { requiresAuth: true },
   },
   {
     path: '/login',
     name: 'Login',
     component: LoginForm,
   },
-  
   {
     path: '/dashboard/:username',
     name: 'Dashboard',
     component: DashboardComponent,
     meta: { requiresAuth: true },
-    props: true, // Это позволяет передавать параметры в качестве свойств
   },
-
 ];
 
 const router = createRouter({

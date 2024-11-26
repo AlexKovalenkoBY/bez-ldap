@@ -18,13 +18,7 @@
 import axios from 'axios';
 
 export default {
-  name: DashboardComponent,
-  props: {
-    username: {
-      type: String,
-      required: true,
-    },
-  },
+  name: 'DashboardComponent',
   data() {
     return {
       userDetails: null,
@@ -32,7 +26,7 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
       this.$router.push('/');
     },
     async fetchUserDetails() {

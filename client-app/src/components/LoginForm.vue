@@ -1,4 +1,3 @@
-<!-- src/components/LoginForm.vue -->
 <template>
   <div class="login-form">
     <h2>Login</h2>
@@ -20,7 +19,7 @@
 import axios from 'axios';
 
 export default {
-  name: LoginForm,
+  name: 'LoginForm',
   data() {
     return {
       username: '',
@@ -38,7 +37,7 @@ export default {
         const refreshToken = response.data.refreshToken;
         localStorage.setItem('accessToken', accessToken); // Сохранение accessToken в localStorage
         localStorage.setItem('refreshToken', refreshToken); // Сохранение refreshToken в localStorage
-        this.$router.push({ name: 'Dashboard', params: { username: this.username } });
+        this.$router.push({ name: 'Files', params: { username: this.username } });
       } catch (error) {
         console.error('Login failed', error);
       }
@@ -46,6 +45,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .login-form {
   max-width: 300px;

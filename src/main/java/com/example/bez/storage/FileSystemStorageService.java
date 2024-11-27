@@ -1,5 +1,7 @@
 package com.example.bez.storage;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -38,8 +40,7 @@ public class FileSystemStorageService implements StorageServiceInterface {
             if (file.isEmpty()) {
                 throw new StorageException("Failed to store empty file.");
             }
-            Path destinationFile = this.rootLocation.resolve(
-                    Paths.get(file.getOriginalFilename()))
+            Path destinationFile = this.rootLocation.resolve(Paths.get(file.getOriginalFilename()))
                     .normalize().toAbsolutePath();
             if (!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
                 // This is a security check
@@ -86,8 +87,7 @@ public class FileSystemStorageService implements StorageServiceInterface {
     @Override
     public Stream<Path> loadAll() {
         try {
-            return Files.walk(this.rootLocation, 1)
-                    .filter(path -> !path.equals(this.rootLocation))
+            return Files.walk(this.rootLocation, 1).filter(path -> !path.equals(this.rootLocation))
                     .map(this.rootLocation::relativize);
         } catch (IOException e) {
             throw new StorageException("Failed to read stored files", e);
@@ -101,8 +101,7 @@ public class FileSystemStorageService implements StorageServiceInterface {
             if (!Files.exists(userDirectory)) {
                 return Stream.empty();
             }
-            return Files.walk(userDirectory, 1)
-                    .filter(path -> !path.equals(userDirectory))
+            return Files.walk(userDirectory, 1).filter(path -> !path.equals(userDirectory))
                     .map(userDirectory::relativize);
         } catch (IOException e) {
             throw new StorageException("Failed to read stored files", e);
@@ -140,6 +139,51 @@ public class FileSystemStorageService implements StorageServiceInterface {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
+        }
+    }
+
+    @Override
+    public void removeAsResource(String filename, String username) {
+        try {
+            Path userDirectory = this.rootLocation.resolve(username);
+            Path filePath = userDirectory.resolve(filename);
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            } else {
+                throw new FileNotFoundException("File not found: " + filename);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete file: " + filename, e);
+        }
+    }
+
+    @Override
+    public Resource saveUserFileFromBytesArray(byte[] fileBytes, String filename, String username) {
+        try {
+            // Создаем папку для пользователя, если она не существует
+            Path userDirectory = this.rootLocation.resolve(username);
+            if (!Files.exists(userDirectory)) {
+                Files.createDirectories(userDirectory);
+            }
+
+            // Путь к файлу внутри папки пользователя
+            Path destinationFile = userDirectory.resolve(Paths.get(filename)).normalize().toAbsolutePath();
+
+            if (!destinationFile.getParent().equals(userDirectory.toAbsolutePath())) {
+                // This is a security check
+                throw new StorageException("Cannot store file outside current directory.");
+            }
+
+            // Сохранение файла на сервере
+            try (FileOutputStream fos = new FileOutputStream(destinationFile.toFile())) {
+                fos.write(fileBytes);
+            }
+
+            // Возвращаем ресурс для сохраненного файла
+            return new UrlResource(destinationFile.toUri());
+        } catch (IOException e) {
+            throw new StorageException("Failed to store file.", e);
         }
     }
 }

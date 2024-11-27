@@ -15,7 +15,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// src/components/DashboardComponent.vue
+import axios from '../axios';
 
 export default {
   name: 'DashboardComponent',
@@ -31,13 +32,7 @@ export default {
     },
     async fetchUserDetails() {
       try {
-        const token = localStorage.getItem('accessToken');
-        console.log('found token - ', token);
-        const response = await axios.get(`http://localhost:8080/api/auth/user/${this.username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(`/auth/user/${this.username}`);
         this.userDetails = response.data;
       } catch (error) {
         console.error('Failed to fetch user details', error);

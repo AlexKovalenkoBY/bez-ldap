@@ -1,6 +1,9 @@
 package com.example.bez.controller;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -19,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.bez.UserDetailsResponse;
 import com.example.bez.jwt.JwtResponse;
 import com.example.bez.jwt.JwtUtils;
@@ -29,16 +31,12 @@ import com.example.bez.userinfo.MyLoginRequest;
 import com.example.bez.userinfo.MyUser;
 import com.example.bez.userinfo.UserService;
 import io.jsonwebtoken.io.IOException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -51,7 +49,7 @@ public class AuthController {
     private final StorageServiceInterface storageService;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-                          StorageServiceInterface storageService) {
+            StorageServiceInterface storageService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.storageService = storageService;
@@ -59,7 +57,8 @@ public class AuthController {
 
     Comparator<File> comparator = Comparator.comparing(file -> {
         try {
-            return Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class).creationTime();
+            return Files.readAttributes(Paths.get(file.toURI()), BasicFileAttributes.class)
+                    .creationTime();
         } catch (java.io.IOException e) {
             log.error("Error reading file attributes", e);
             return null;
@@ -68,8 +67,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody MyLoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication =
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication.getName());
@@ -92,13 +92,9 @@ public class AuthController {
         }
 
         String role = userService.determineRole(user.getDn().toString());
-        UserDetailsResponse userDetails = new UserDetailsResponse(
-                user.getUsername(),
-                user.getCommonName(),
-                user.getSurname(),
-                user.getGivenName(),
-                user.getDisplayName(),
-                role);
+        UserDetailsResponse userDetails =
+                new UserDetailsResponse(user.getUsername(), user.getCommonName(), user.getSurname(),
+                        user.getGivenName(), user.getDisplayName(), role);
 
         return ResponseEntity.ok(userDetails);
     }
@@ -111,10 +107,50 @@ public class AuthController {
         if (username == null) {
             return ResponseEntity.badRequest().body("Invalid token");
         }
-        return ResponseEntity.ok(storageService.loadAllByUsername(username).map(
-                path -> MvcUriComponentsBuilder.fromMethodName(AuthController.class,
+        return ResponseEntity.ok(storageService.loadAllByUsername(username)
+                .map(path -> MvcUriComponentsBuilder.fromMethodName(AuthController.class,
                         "serveFile", path.getFileName().toString()).build().toUri().toString())
                 .collect(Collectors.toList()));
+    }
+
+    @PostMapping("/uploadfiles")
+    public ResponseEntity<String> uploadFile(@RequestParam("files") MultipartFile[] files,
+            @RequestHeader("Authorization") String token) {
+        // Извлекаем имя пользователя из токена
+        String username = jwtUtils.getUsernameFromJwtToken(token.replace("Bearer ", ""));
+
+        if (username == null) {
+            return ResponseEntity.badRequest().body("Invalid token");
+        }
+
+        try {
+            for (MultipartFile file : files) {
+                storageService.store(file, username);
+            }
+            return ResponseEntity.ok("Файлы успешно загружены");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Ошибка при загрузке файлов: " + e.getMessage());
+        }
+    }
+
+ @DeleteMapping("/deleteFile/{filename}")
+    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
+        // Декодируем URL-кодированное имя файла
+        String decodedFilename = URLDecoder.decode(filename, StandardCharsets.UTF_8);
+
+        // Кодируем имя файла для заголовка Content-Disposition
+        String encodedFilename = "UTF-8''" + URLEncoder.encode(decodedFilename, StandardCharsets.UTF_8);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "inline; filename*=\"" + encodedFilename + "\"");
+
+        // Логика удаления файла
+        // ...
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body("File deleted successfully");
     }
 
     @GetMapping("/upload-dir/{filename:.+}")
@@ -127,9 +163,9 @@ public class AuthController {
         }
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
-                .body(file);
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=")
+                .header(HttpHeaders.CONTENT_TYPE, "application/pdf").body(file);
     }
 
     @ExceptionHandler(StorageFileNotFoundException.class)

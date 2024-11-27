@@ -1,4 +1,6 @@
+<!-- src/components/FilesComponent.vue -->
 <template>
+    <NewFileUploader @fileUploaded="getFilesList"/>
     <div class="container-fluid" style="max-width: 800px; margin: 0 auto;">
         <h2 class="text-center">Список скачанных файлов</h2>
 
@@ -16,8 +18,7 @@
                         <td>{{ file.name }}</td>
                         <td><a :href="file.url" title="Скачать этот файл">Скачать</a></td>
                         <td>
-                            <a :href="'/files/delete/' + file.name" :fileName="file.name"
-                                v-on:click.prevent="confirmDelete(file.name)" title="Удалить этот файл"
+                            <a href="#" @click.prevent="confirmDelete(file.name)" title="Удалить этот файл"
                                 class="fa-regular fa-trash-can icon-dark btn-delete">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
                                     viewBox="0 0 16 16">
@@ -37,14 +38,21 @@
             <span>Нет скачаных файлов!</span>
         </div>
 
-
+        <!-- Используем компонент ConfirmModal -->
+        <confirm-modal :fileName="fileToDelete" @confirm="deleteFile" ref="confirmModal"></confirm-modal>
     </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '../axios';
+import ConfirmModal from './ConfirmModal.vue';
+import NewFileUploader from './NewFileUploader.vue';
 
 export default {
+    components: {
+        ConfirmModal,
+        NewFileUploader
+    },
     data() {
         return {
             folderList: [], // Здесь будет список файлов
@@ -54,28 +62,36 @@ export default {
     methods: {
         confirmDelete(fileName) {
             this.fileToDelete = fileName;
-            $('#confirmModal').modal('show');
+            this.$refs.confirmModal.showModal(); // Показываем модальное окно
         },
-        deleteFile() {
-            // Логика удаления файла
-            console.log('Удаляем файл:', this.fileToDelete);
-            // После удаления можно обновить список файлов
-            this.folderList = this.folderList.filter(file => file.name !== this.fileToDelete);
-            $('#confirmModal').modal('hide');
+        async deleteFile() {
+            try {
+                // Удаляем файл на сервере
+                await this.deleteFileOnServer(this.fileToDelete);
+
+                // Обновляем список файлов
+                this.folderList = this.folderList.filter(file => file.name !== this.fileToDelete);
+
+                // Скрываем модальное окно
+                this.$refs.confirmModal.hideModal();
+            } catch (error) {
+                console.error('Failed to delete file', error);
+            }
+        },
+        async deleteFileOnServer(fileName) {
+            try {
+                await axios.delete(`/auth/deleteFile/${fileName}`);
+            } catch (error) {
+                console.error('Failed to delete file on server', error);
+                throw error;
+            }
         },
         async getFilesList() {
             try {
-                const token = localStorage.getItem('accessToken');
-                if (token) {
-                    const response = await axios.post('http://localhost:8080/api/auth/getFilesList', {}, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    folderList.value = response.data;
-                } else {
-                    this.$router.push({ name: 'Login' });
-                }
+                const response = await axios.post('/auth/getFilesList');
+                this.folderList = response.data.map(f => {
+                    return { name: f.slice(f.lastIndexOf("/") + 1), url: f };
+                });
             } catch (error) {
                 console.error('Failed to fetch user files list ', error);
                 if (error.response && error.response.status === 403) {

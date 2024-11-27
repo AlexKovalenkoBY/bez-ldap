@@ -16,12 +16,12 @@ const routes = [
     name: 'Login',
     component: LoginForm,
   },
-  // {
-  //   path: '/dashboard/:username',
-  //   name: 'Dashboard',
-  //   component: DashboardComponent,
-  //   meta: { requiresAuth: true },
-  // },
+  {
+    path: '/dashboard/',
+    name: 'Dashboard',
+    component: DashboardComponent,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({

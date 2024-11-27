@@ -16,7 +16,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+// src/components/LoginForm.vue
+import axios from '../axios';
 
 export default {
   name: 'LoginForm',
@@ -29,7 +30,7 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const response = await axios.post('http://localhost:8080/api/auth/login', {
+        const response = await axios.post('/auth/login', {
           username: this.username,
           password: this.password,
         });
@@ -37,7 +38,7 @@ export default {
         const refreshToken = response.data.refreshToken;
         localStorage.setItem('accessToken', accessToken); // Сохранение accessToken в localStorage
         localStorage.setItem('refreshToken', refreshToken); // Сохранение refreshToken в localStorage
-        this.$router.push({ name: 'Files', params: { username: this.username } });
+        this.$router.push({ name: 'Files',  });
       } catch (error) {
         console.error('Login failed', error);
       }

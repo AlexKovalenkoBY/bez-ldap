@@ -8,19 +8,19 @@ import java.util.stream.Stream;
 
 public interface StorageServiceInterface {
 
-	void init();
+    void init();
 
-	// void storeAsPdf(com.itextpdf.text.Document  file);
-	void store(MultipartFile file);
-	void store(MultipartFile file, String username);
+    void store(MultipartFile file);
+    void store(MultipartFile file, String username);
 
-	Stream<Path> loadAll();
-	Stream<Path> loadAllByUsername(String username);
+    Stream<Path> loadAll();
+    Stream<Path> loadAllByUsername(String username);
 
-	Path load(String filename);
+    Path load(String filename);
 
-	Resource loadAsResource(String filename);
+    Resource loadAsResource(String filename);
+    Resource saveUserFileFromBytesArray(byte[] fileBytes, String filename, String username);
+    void removeAsResource(String filename, String username);
 
-	void deleteAll();
-
+    void deleteAll();
 }

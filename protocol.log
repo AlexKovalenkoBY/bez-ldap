@@ -10063,3 +10063,27 @@ java.lang.IllegalArgumentException: The Unicode character [п] at code point [1,
 2024-11-27T16:30:53.542+03:00 DEBUG 9864 --- [bez] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, RequestLoggingFilter, JwtRequestFilter, UsernamePasswordAuthenticationFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, SessionManagementFilter, ExceptionTranslationFilter, AuthorizationFilter
 2024-11-27T16:30:54.498+03:00  INFO 9864 --- [bez] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
 2024-11-27T16:30:54.527+03:00  INFO 9864 --- [bez] [main] com.example.bez.BezApplication           : Started BezApplication in 7.783 seconds (process running for 9.737)
+2024-11-27T16:31:21.721+03:00  INFO 9864 --- [bez] [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-11-27T16:31:21.915+03:00  INFO 9864 --- [bez] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2024-11-27T16:31:22.061+03:00  INFO 9864 --- [bez] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 78 ms
+2024-11-27T16:31:22.182+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-2] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/auth/getFilesList
+2024-11-27T16:31:22.278+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/getFilesList
+2024-11-27T16:31:22.278+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-1] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/getFilesList
+2024-11-27T16:31:22.410+03:00  WARN 9864 --- [bez] [http-nio-8080-exec-1] o.s.ldap.odm.core.impl.ObjectMetaData    : The Entry class MyUser should be declared final
+2024-11-27T16:31:22.544+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-1] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/getFilesList
+2024-11-27T16:31:22.544+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-1] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/getFilesList
+2024-11-27T16:31:28.606+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-3] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/auth/uploadfiles
+2024-11-27T16:31:28.620+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/uploadfiles
+2024-11-27T16:31:28.632+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-5] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/uploadfiles
+2024-11-27T16:31:28.652+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-5] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/uploadfiles
+2024-11-27T16:31:28.653+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-5] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/uploadfiles
+2024-11-27T16:31:28.756+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-6] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/auth/getFilesList
+2024-11-27T16:31:28.765+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Securing POST /api/auth/getFilesList
+2024-11-27T16:31:28.769+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-7] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/getFilesList
+2024-11-27T16:31:28.779+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-7] o.s.security.web.FilterChainProxy        : Secured POST /api/auth/getFilesList
+2024-11-27T16:31:28.779+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-7] com.example.bez.RequestLoggingFilter     : Request: POST /api/auth/getFilesList
+2024-11-27T16:31:32.220+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-8] o.s.security.web.FilterChainProxy        : Securing OPTIONS /api/auth/deleteFile/Баланс 1кв-л 2024.xls.pdf
+2024-11-27T16:31:32.237+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Securing DELETE /api/auth/deleteFile/Баланс 1кв-л 2024.xls.pdf
+2024-11-27T16:31:32.239+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-9] com.example.bez.RequestLoggingFilter     : Request: DELETE /api/auth/deleteFile/%D0%91%D0%B0%D0%BB%D0%B0%D0%BD%D1%81%201%D0%BA%D0%B2-%D0%BB%202024.xls.pdf
+2024-11-27T16:31:32.250+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-9] o.s.security.web.FilterChainProxy        : Secured DELETE /api/auth/deleteFile/Баланс 1кв-л 2024.xls.pdf
+2024-11-27T16:31:32.251+03:00 DEBUG 9864 --- [bez] [http-nio-8080-exec-9] com.example.bez.RequestLoggingFilter     : Request: DELETE /api/auth/deleteFile/%D0%91%D0%B0%D0%BB%D0%B0%D0%BD%D1%81%201%D0%BA%D0%B2-%D0%BB%202024.xls.pdf

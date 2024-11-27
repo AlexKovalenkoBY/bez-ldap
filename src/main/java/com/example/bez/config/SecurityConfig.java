@@ -29,6 +29,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import com.example.bez.RequestLoggingFilter;
 import com.example.bez.jwt.JwtRequestFilter;
 import com.example.bez.userinfo.CustomUserDetailsService;
 
@@ -38,7 +39,8 @@ public class SecurityConfig {
 
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
-
+    @Autowired
+    private RequestLoggingFilter requestLoggingFilter;
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
@@ -48,7 +50,7 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/login").permitAll() // Разрешить доступ без проверки токена
-                .requestMatchers("/api/auth/user").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
+               // .requestMatchers("/api/auth/user").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
                 .requestMatchers("/api/auth/**").hasAnyRole("ADMIN", "USER") // доступ для ролей admin и user
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешить OPTIONS для всех запросов
                 .anyRequest().authenticated()
@@ -70,6 +72,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new Http403ForbiddenEntryPoint()) // Настройка обработки ошибок аутентификации
             )
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(requestLoggingFilter, JwtRequestFilter.class)
             .cors(cors -> cors.configurationSource(corsConfigurationSource())); // Добавляем CORS конфигурацию
         return http.build();
     }

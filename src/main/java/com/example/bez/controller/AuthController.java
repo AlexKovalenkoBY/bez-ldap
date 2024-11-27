@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     AuthenticationManager authenticationManager;
 
@@ -51,7 +51,7 @@ public class AuthController {
     private final StorageServiceInterface storageService;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
-    StorageServiceInterface storageService) {
+                          StorageServiceInterface storageService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
         this.storageService = storageService;
@@ -103,15 +103,15 @@ public class AuthController {
         return ResponseEntity.ok(userDetails);
     }
 
-    @GetMapping("/getFilesList")
+    @PostMapping("/getFilesList")
     public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String token) {
         // Извлекаем имя пользователя из токена
-        String username = jwtUtils.extractUsername(token.replace("Bearer ", ""));
+        String username = jwtUtils.getUsernameFromJwtToken(token.replace("Bearer ", ""));
 
         if (username == null) {
             return ResponseEntity.badRequest().body("Invalid token");
         }
-        return ResponseEntity.ok(storageService.loadAll().map(
+        return ResponseEntity.ok(storageService.loadAllByUsername(username).map(
                 path -> MvcUriComponentsBuilder.fromMethodName(AuthController.class,
                         "serveFile", path.getFileName().toString()).build().toUri().toString())
                 .collect(Collectors.toList()));
@@ -132,26 +132,8 @@ public class AuthController {
                 .body(file);
     }
 
-    @PostMapping("/")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-        log.info("start POST request");
-        try {
-            if (!file.isEmpty()) {
-                storageService.store(file);
-                redirectAttributes.addFlashAttribute("message",
-                        "You successfully uploaded " + file.getOriginalFilename() + "!");
-            }
-        } catch (Exception e) {
-            log.error("Error uploading file", e);
-            redirectAttributes.addFlashAttribute("message", "Failed to upload " + file.getOriginalFilename() + "!");
-        }
-        log.info("end POST request");
-        return "redirect:/";
-    }
-
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
         return ResponseEntity.notFound().build();
     }
-
 }

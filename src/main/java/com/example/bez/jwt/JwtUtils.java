@@ -16,7 +16,41 @@ import java.util.function.Function;
 public class JwtUtils {
 
     @Value("${jwt.secret}")
-    private String secret;
+    private String jwtSecret;
+
+    @Value("${jwt.expirationMs}")
+    private int jwtExpirationMs;
+
+
+    public String generateJwtToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
+    public String getUsernameFromJwtToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
+
+    public boolean validateJwtToken(String authToken) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            return true;
+        } catch (Exception e) {
+            // Handle exception
+        }
+        return false;
+    }
+
+
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -32,22 +66,19 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateJwtToken(String username) {
-        Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
-    }
+
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 hours
-                .signWith(SignatureAlgorithm.HS256, secret).compact();
+                .signWith(SignatureAlgorithm.HS256, jwtSecret).compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

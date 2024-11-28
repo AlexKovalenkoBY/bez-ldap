@@ -1,25 +1,18 @@
 package com.example.bez.jwt;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
 public class JwtResponse {
-    private String token;
     private String type = "Bearer";
     private String role;
+    private String accessToken;
+    private String refreshToken;
 
-    public JwtResponse(String accessToken, String role) {
-        this.token = accessToken;
-        this.role = role;
-    }
 
-    // Getters
-    public String getToken() {
-        return token;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getRole() {
-        return role;
-    }
 }
+

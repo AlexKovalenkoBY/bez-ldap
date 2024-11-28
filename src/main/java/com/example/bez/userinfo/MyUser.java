@@ -6,9 +6,11 @@ import org.springframework.ldap.odm.annotations.Entry;
 import org.springframework.ldap.odm.annotations.Id;
 import lombok.Getter;
 import lombok.Setter;
+
 @Getter
 @Setter
-@Entry(base = "ou=users,dc=test,dc=bpab,dc=internal", objectClasses = { "inetOrgPerson", "organizationalPerson", "person", "top" })
+@Entry(base = "ou=users,dc=test,dc=bpab,dc=internal", objectClasses = { "inetOrgPerson", "organizationalPerson",
+        "person", "top" })
 public class MyUser {
 
     @Id
@@ -31,6 +33,14 @@ public class MyUser {
 
     @Attribute(name = "displayName")
     private String displayName;
+    private String refreshToken;
 
-  
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 }

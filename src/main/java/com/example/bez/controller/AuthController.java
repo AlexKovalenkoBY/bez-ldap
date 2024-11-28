@@ -22,8 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import com.example.bez.RefreshTokenRequest;
 import com.example.bez.UserDetailsResponse;
 import com.example.bez.jwt.JwtResponse;
+import com.example.bez.jwt.JwtTokenService;
 import com.example.bez.jwt.JwtUtils;
 import com.example.bez.storage.StorageFileNotFoundException;
 import com.example.bez.storage.StorageServiceInterface;
@@ -39,13 +41,15 @@ import lombok.extern.slf4j.Slf4j;
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
-
+    @Autowired
+    JwtTokenService jwtTokenService;
     @Autowired
     JwtUtils jwtUtils;
 
     @Autowired
     UserService userService;
-
+    @Autowired
+    UserReposito
     private final StorageServiceInterface storageService;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
@@ -64,6 +68,25 @@ public class AuthController {
             return null;
         }
     });
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        String username = jwtTokenService.extractUsername(refreshToken);
+
+        MyUser user = userRepository.findByUsername(username);
+        if (user != null && user.getRefreshToken().equals(refreshToken)
+                && !jwtTokenService.isTokenExpired(refreshToken)) {
+            String newAccessToken = jwtTokenService.generateToken(username);
+            String newRefreshToken = jwtTokenService.generateRefreshToken(username);
+            user.setRefreshToken(newRefreshToken);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(new JwtResponse(newAccessToken, newRefreshToken));
+        } else {
+            return ResponseEntity.badRequest().body("Invalid refresh token");
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody MyLoginRequest loginRequest) {
@@ -134,13 +157,14 @@ public class AuthController {
         }
     }
 
- @DeleteMapping("/deleteFile/{filename}")
+    @DeleteMapping("/deleteFile/{filename}")
     public ResponseEntity<String> deleteFile(@PathVariable String filename) {
         // Декодируем URL-кодированное имя файла
         String decodedFilename = URLDecoder.decode(filename, StandardCharsets.UTF_8);
 
         // Кодируем имя файла для заголовка Content-Disposition
-        String encodedFilename = "UTF-8''" + URLEncoder.encode(decodedFilename, StandardCharsets.UTF_8);
+        String encodedFilename =
+                "UTF-8''" + URLEncoder.encode(decodedFilename, StandardCharsets.UTF_8);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename*=\"" + encodedFilename + "\"");
@@ -148,9 +172,7 @@ public class AuthController {
         // Логика удаления файла
         // ...
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body("File deleted successfully");
+        return ResponseEntity.ok().headers(headers).body("File deleted successfully");
     }
 
     @GetMapping("/upload-dir/{filename:.+}")
@@ -162,9 +184,7 @@ public class AuthController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=")
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=")
                 .header(HttpHeaders.CONTENT_TYPE, "application/pdf").body(file);
     }
 
